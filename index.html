@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#162c54">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Merit Clinic">
+  <link rel="apple-touch-icon" href="logo.png">
+  <title>Merit Physiotherapy Clinic - ระบบเวชระเบียนคนไข้กายภาพบำบัด</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="alternate icon" type="image/png" href="logo.png">
+
+  <!-- Google Fonts: Sarabun, Prompt, Cinzel, Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar no-print">
+      <div class="sidebar-header">
+        <div class="clinic-logo-wrap">
+          <img src="logo.png" alt="Merit Physiotherapy Clinic Logo">
+        </div>
+        <div class="clinic-brand-text">
+          <div class="clinic-title-eng">MERIT</div>
+          <div class="clinic-subtitle-eng">PHYSIOTHERAPY CLINIC</div>
+          <div class="clinic-title-th">คลินิกกายภาพบำบัดเมอริท</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="patient-tab">
+          <i class="fa-solid fa-user-injured"></i>
+          <span class="nav-label">ข้อมูลคนไข้</span><span class="nav-label-short">คนไข้</span>
+        </button>
+
+        <button class="nav-item" data-tab="diagnosis-tab">
+          <i class="fa-solid fa-stethoscope"></i>
+          <span class="nav-label">ข้อมูลการวินิจฉัย</span><span class="nav-label-short">วินิจฉัย</span>
+        </button>
+
+        <button class="nav-item" data-tab="search-tab">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span class="nav-label">ค้นหาข้อมูล</span><span class="nav-label-short">ค้นหา</span>
+        </button>
+
+        <button class="nav-item" data-tab="appointment-tab">
+          <i class="fa-solid fa-calendar-check"></i>
+          <span class="nav-label">ตารางนัดหมาย</span><span class="nav-label-short">นัดหมาย</span>
+        </button>
+
+        <button class="nav-item" data-tab="billing-tab">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+          <span class="nav-label">คิดเงิน / ใบเสร็จ</span><span class="nav-label-short">คิดเงิน</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-tag">
+          <span class="status-dot"></span>
+          <span id="system-status-text">ระบบเวชระเบียนพร้อมใช้งาน</span>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <button class="btn btn-outline btn-sm" id="btn-open-settings" style="flex: 1; font-size: 11px; padding: 5px; color: #cbd5e1; border-color: rgba(255,255,255,0.2); background: transparent;">
+            <i class="fa-brands fa-google-drive"></i> Sheets & Drive
+          </button>
+          <button class="btn btn-outline btn-sm" id="btn-export-backup" style="font-size: 11px; padding: 5px 8px; color: #cbd5e1; border-color: rgba(255,255,255,0.2); background: transparent;" title="สำรองข้อมูล JSON">
+            <i class="fa-solid fa-download"></i> สำรอง
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN VIEWPORT -->
+    <main class="main-wrapper">
+      
+      <!-- TOP APP HEADER -->
+      <header class="top-header no-print">
+        <div class="header-left">
+          <h1 class="header-page-title" id="top-title">
+            <i class="fa-solid fa-user-injured" style="color: var(--primary-light);"></i>
+            <span>ข้อมูลคนไข้</span>
+          </h1>
+          <span class="header-page-subtitle" id="top-subtitle">บันทึกข้อมูลส่วนตัว ประวัติการรักษา และสัญญาณชีพ</span>
+        </div>
+
+        <div class="header-actions">
+          <!-- Editing Indicator Chip -->
+          <div class="editing-chip hidden" id="editing-indicator">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>กำลังแก้ไข HN: <strong id="edit-hn-tag">-</strong></span>
+            <button class="btn btn-sm btn-outline" id="btn-cancel-edit" style="padding: 2px 8px; font-size: 11px; margin-left: 4px; border-color: #f59e0b; color: #b45309;">ยกเลิก</button>
+          </div>
+
+          <button class="btn btn-outline" id="btn-new-patient" title="ล้างแบบฟอร์มเพื่อสร้างคนไข้ใหม่">
+            <i class="fa-solid fa-user-plus"></i><span class="btn-label">คนไข้ใหม่</span>
+          </button>
+
+          <button class="btn btn-primary" id="btn-save-patient">
+            <i class="fa-solid fa-floppy-disk"></i><span class="btn-label">บันทึกข้อมูล</span>
+          </button>
+
+          <!-- Settings shortcut: shown on phones, where the sidebar footer is hidden -->
+          <button type="button" class="btn btn-outline btn-icon-only mobile-only" id="btn-mobile-settings" title="ตั้งค่าการเชื่อมต่อ" aria-label="ตั้งค่าการเชื่อมต่อ">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- CONTENT PANES -->
+      <div class="content-viewport">
+        
+        <!-- ===================================================================
+             TAB 1: PATIENT INFORMATION
+             =================================================================== -->
+        <section class="tab-pane active" id="patient-tab">
+          <form id="form-patient" onsubmit="return false;">
+            
+            <div class="card-panel">
+              <div class="gold-divider-title">
+                <div class="title-text">
+                  <i class="fa-solid fa-address-card"></i>
+                  <span>ข้อมูลประวัติผู้ป่วย (Patient Demographics)</span>
+                </div>
+                <div class="gold-divider-line"></div>
+              </div>
+
+              <div class="form-grid">
+                
+                <!-- HN Auto-Run -->
+                <div class="form-group col-4">
+                  <label for="patient-hn">HN (เลขประจำตัวคนไข้) <span class="req">*</span></label>
+                  <div class="hn-auto-wrap">
+                    <input type="text" id="patient-hn" placeholder="00001" required>
+                    <button type="button" class="btn-hn-auto" id="btn-gen-hn" title="คำนวณรัน HN ถัดไปอัตโนมัติ">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i> รัน HN
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Treatment Date -->
+                <div class="form-group col-4">
+                  <label for="treatment-date">วันที่รักษา <span class="req">*</span></label>
+                  <div class="input-with-icon">
+                    <i class="fa-regular fa-calendar-check"></i>
+                    <input type="text" id="treatment-date" placeholder="วว/ดด/ปปปป (พ.ศ.)" required>
+                  </div>
+                </div>
+
+                <!-- National ID 13 Digits -->
+                <div class="form-group col-4">
+                  <label for="national-id">รหัสบัตรประชาชน (13 หลัก)</label>
+                  <div class="input-with-icon">
+                    <i class="fa-solid fa-id-card"></i>
+                    <input type="text" id="national-id" maxlength="17" placeholder="ระบุเลข 13 หลัก">
+                  </div>
+                </div>
+
+                <!-- First Name -->
+                <div class="form-group col-5">
+                  <label for="first-name">ชื่อ <span class="req">*</span></label>
+                  <input type="text" id="first-name" placeholder="ชื่อจริงผู้ป่วย" required>
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-group col-5">
+                  <label for="last-name">นามสกุล <span class="req">*</span></label>
+                  <input type="text" id="last-name" placeholder="นามสกุล" required>
+                </div>
+
+                <!-- Gender -->
+                <div class="form-group col-2">
+                  <label for="gender">เพศ</label>
+                  <select id="gender">
+                    <option value="">-- เลือก --</option>
+                    <option value="ชาย">ชาย</option>
+                    <option value="หญิง">หญิง</option>
+                    <option value="อื่น ๆ">อื่น ๆ</option>
+                  </select>
+                </div>
+
+                <!-- Birth Date Dropdowns & Auto Age -->
+                <div class="form-group col-5">
+                  <label>วันเกิด (วัน / เดือน / ปี พ.ศ.) <span class="req">*</span></label>
+                  <div class="dob-flex-row">
+                    <select id="dob-day" required>
+                      <option value="">วัน</option>
+                    </select>
+                    <select id="dob-month" required>
+                      <option value="">เดือน</option>
+                      <option value="1">มกราคม</option>
+                      <option value="2">กุมภาพันธ์</option>
+                      <option value="3">มีนาคม</option>
+                      <option value="4">เมษายน</option>
+                      <option value="5">พฤษภาคม</option>
+                      <option value="6">มิถุนายน</option>
+                      <option value="7">กรกฎาคม</option>
+                      <option value="8">สิงหาคม</option>
+                      <option value="9">กันยายน</option>
+                      <option value="10">ตุลาคม</option>
+                      <option value="11">พฤศจิกายน</option>
+                      <option value="12">ธันวาคม</option>
+                    </select>
+                    <select id="dob-year" required>
+                      <option value="">ปี พ.ศ.</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Auto-Calculated Age -->
+                <div class="form-group col-2">
+                  <label for="patient-age">อายุ (ปี)</label>
+                  <input type="number" id="patient-age" readonly placeholder="คำนวณอัตโนมัติ">
+                </div>
+
+                <!-- Ethnicity -->
+                <div class="form-group col-2">
+                  <label for="ethnicity">เชื้อชาติ</label>
+                  <input type="text" id="ethnicity" value="ไทย" placeholder="เช่น ไทย">
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group col-3">
+                  <label for="phone">เบอร์โทรศัพท์ <span class="req">*</span></label>
+                  <div class="input-with-icon">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="phone" placeholder="เช่น 0812345678" required>
+                  </div>
+                </div>
+
+                <!-- Address -->
+                <div class="form-group col-12">
+                  <label for="patient-address">ที่อยู่ (Address)</label>
+                  <textarea id="patient-address" rows="2" placeholder="บ้านเลขที่, ซอย, ถนน, ตำบล/แขวง, อำเภอ/เขต, จังหวัด, รหัสไปรษณีย์..."></textarea>
+                </div>
+
+              </div>
+
+              <!-- EMERGENCY CONTACT SECTION -->
+              <div class="section-sub-header">
+                <i class="fa-solid fa-phone-volume"></i>
+                <span>ข้อมูลติดต่อฉุกเฉิน (Emergency Contact)</span>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group col-5">
+                  <label for="emergency-name">ชื่อผู้ติดต่อฉุกเฉิน</label>
+                  <input type="text" id="emergency-name" placeholder="ชื่อ-นามสกุล ผู้ติดต่อกรณีฉุกเฉิน">
+                </div>
+
+                <div class="form-group col-4">
+                  <label for="emergency-phone">เบอร์โทรศัพท์ฉุกเฉิน</label>
+                  <div class="input-with-icon">
+                    <i class="fa-solid fa-phone-flip"></i>
+                    <input type="tel" id="emergency-phone" placeholder="เบอร์โทรติดต่อฉุกเฉิน">
+                  </div>
+                </div>
+
+                <div class="form-group col-3">
+                  <label for="emergency-relation">ความสัมพันธ์</label>
+                  <input type="text" id="emergency-relation" placeholder="เช่น บิดา, มารดา, คู่สมรส, ญาติ">
+                </div>
+              </div>
+
+              <!-- VITAL SIGNS & BMI CALCULATION SECTION -->
+              <div class="section-sub-header">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <span>สัญญาณชีพ & ระบบคำนวณและแปลผล BMI อัตโนมัติ (Vital Signs & BMI)</span>
+              </div>
+
+              <div class="vital-signs-panel">
+                <div class="vital-grid">
+                  
+                  <!-- BP -->
+                  <div class="form-group">
+                    <label for="vital-bp">BP <span class="vital-unit">(mmHg)</span></label>
+                    <input type="text" id="vital-bp" placeholder="เช่น 120/80">
+                  </div>
+
+                  <!-- PR -->
+                  <div class="form-group">
+                    <label for="vital-pr">PR <span class="vital-unit">(bpm)</span></label>
+                    <input type="number" id="vital-pr" placeholder="เช่น 72">
+                  </div>
+
+                  <!-- Weight -->
+                  <div class="form-group">
+                    <label for="vital-weight">Weight <span class="vital-unit">(kg)</span></label>
+                    <input type="number" step="0.1" id="vital-weight" placeholder="เช่น 65.5">
+                  </div>
+
+                  <!-- Height -->
+                  <div class="form-group">
+                    <label for="vital-height">Height <span class="vital-unit">(cm)</span></label>
+                    <input type="number" step="0.5" id="vital-height" placeholder="เช่น 170">
+                  </div>
+
+                  <!-- Auto BMI Card -->
+                  <div class="bmi-widget-card">
+                    <div class="bmi-header-row">
+                      <span>ดัชนีมวลกาย (BMI)</span>
+                      <span style="font-size: 11px; color: var(--text-muted);">kg/m²</span>
+                    </div>
+                    <div class="bmi-val-row">
+                      <span class="bmi-number" id="display-bmi">-</span>
+                      <span class="bmi-interpretation-chip" id="display-bmi-status">รอข้อมูลส่วนสูง/น้ำหนัก</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- MEDICAL HISTORY & SUBJECTIVE EXAMINATION -->
+              <div class="section-sub-header">
+                <i class="fa-solid fa-notes-medical"></i>
+                <span>ประวัติการเจ็บป่วย & Subjective Examination</span>
+              </div>
+
+              <div class="form-grid">
+                <!-- Underlying Disease -->
+                <div class="form-group col-12">
+                  <label for="underlying-disease">โรคประจำตัว (Underlying Disease)</label>
+                  <input type="text" id="underlying-disease" placeholder="เช่น ความดันโลหิตสูง, เบาหวาน, โรคหัวใจ (ถ้าไม่มีให้ระบุ - )">
+                </div>
+
+                <!-- Present Illness / Chief Complaint -->
+                <div class="form-group col-12">
+                  <label for="chief-complaint">ประวัติปัจจุบัน (Present Illness: PI / Chief Complaint: CC)</label>
+                  <textarea id="chief-complaint" rows="3" placeholder="ระบุอาการสำคัญที่มารักษา ระยะเวลาที่เริ่มเป็น พฤติกรรมหรือกิจกรรมที่เป็นตัวกระตุ้น..."></textarea>
+                </div>
+
+                <!-- Large Subjective Examination -->
+                <div class="form-group col-12">
+                  <label for="subjective-exam">
+                    <span>Subjective Examination (การซักประวัติอย่างละเอียด)</span>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">* ลักษณะอาการปวด, กลไกการบาดเจ็บ, ระดับความปวด VAS (0-10), ปัจจัยกระตุ้น/บรรเทา</span>
+                  </label>
+                  <textarea id="subjective-exam" class="subjective-box" rows="5" placeholder="ระบุข้อมูลการซักประวัติคนไข้ เช่น ลักษณะอาการปวด (ชา, ปวดแปล๊บ, ตื้อ), VAS Score, ปัจจัยที่ทำให้อาการดีขึ้นหรือแย่ลง, ท่าทางหรือกิจกรรมในชีวิตประจำวัน..."></textarea>
+                </div>
+              </div>
+
+              <!-- PROMINENT 2-COLUMN ALERT BOXES: YELLOW (DRUG ALLERGY) & PINK (CONTRAINDICATIONS) -->
+              <div class="alert-boxes-container">
+                
+                <!-- Yellow Box: Drug Allergy -->
+                <div class="alert-box-yellow">
+                  <div class="alert-title-bar">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 18px;"></i>
+                    <span>แพ้ยา (Drug Allergies)</span>
+                  </div>
+                  <textarea id="drug-allergy" rows="3" placeholder="ระบุชื่อยาที่มีประวัติแพ้และอาการแพ้ (ถ้าไม่มีประวัติแพ้ยาให้ใส่ - )"></textarea>
+                </div>
+
+                <!-- Pink Box: Contraindications / Precautions -->
+                <div class="alert-box-pink">
+                  <div class="alert-title-bar">
+                    <i class="fa-solid fa-ban" style="font-size: 18px;"></i>
+                    <span>ข้อห้าม / ควรระวัง (Contraindications & Precautions)</span>
+                  </div>
+                  <textarea id="contraindications" rows="3" placeholder="ระบุข้อห้ามหรือข้อควรระวังในการทำกายภาพบำบัด เช่น การใส่อวัยวะเทียม/โลหะ, โรคมะเร็ง, ภาวะกระดูกพรุนรุนแรง, ข้อควรระวังในการกดหรือดัดดึง..."></textarea>
+                </div>
+
+              </div>
+
+              <!-- Wizard Forward Button -->
+              <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+                <button type="button" class="btn btn-gold" id="btn-next-to-diag">
+                  <span>ไปยังข้อมูลการวินิจฉัยและการตรวจร่างกาย</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+
+            </div>
+
+          </form>
+        </section>
+
+
+        <!-- ===================================================================
+             TAB 2: DIAGNOSIS & PHYSICAL EXAMINATION
+             =================================================================== -->
+        <section class="tab-pane" id="diagnosis-tab">
+          <form id="form-diagnosis" onsubmit="return false;">
+            
+            <div class="card-panel">
+              
+              <!-- Title with Luxury Gold Line Divider -->
+              <div class="gold-divider-title">
+                <div class="title-text">
+                  <i class="fa-solid fa-stethoscope"></i>
+                  <span>ผลการวินิจฉัยและการตรวจร่างกาย</span>
+                </div>
+                <div class="gold-divider-line"></div>
+              </div>
+
+              <div class="form-grid">
+                
+                <!-- 1. Observation -->
+                <div class="form-group col-12">
+                  <label for="exam-observation">
+                    <span>1. Observation (การสังเกต)</span>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">โครงสร้างร่างกาย, ท่าทาง (Posture), การลงน้ำหนัก, Gait pattern, อาการบวม แดง ผิดรูป</span>
+                  </label>
+                  <textarea id="exam-observation" rows="3" placeholder="ผลการสังเกตโครงสร้าง ท่าทางการเดิน ความสมมาตรของร่างกาย บวม แดง..."></textarea>
+                </div>
+
+                <!-- 2. Palpation -->
+                <div class="form-group col-12">
+                  <label for="exam-palpation">
+                    <span>2. Palpation (การคลำ)</span>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">อุณหภูมิผิวหนัง, ความตึงตัวของกล้ามเนื้อ (Muscle tone / Taut band), จุดกดเจ็บ (Trigger points), บวมน้ำ</span>
+                  </label>
+                  <textarea id="exam-palpation" rows="3" placeholder="ผลการคลำตรวจ เช่น พบ Trigger point ที่ Upper Trapezius, อุณหภูมิผิวหนังปกติ/อุ่น, Muscle spasm..."></textarea>
+                </div>
+
+                <!-- 3. Measurement -->
+                <div class="form-group col-12">
+                  <label for="exam-measurement">
+                    <span>3. Measurement (การวัด)</span>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">มุมการเคลื่อนไหวข้อต่อ (ROM), ความยาวขา (Leg Length), เส้นรอบวงกล้ามเนื้อ (Circumference)</span>
+                  </label>
+                  <textarea id="exam-measurement" rows="3" placeholder="เช่น Cervical ROM (Flexion 40°, Ext 45°, Rot 60°), Shoulder Abduction 160°, True leg length difference..."></textarea>
+                </div>
+
+                <!-- 4. Physical Examination -->
+                <div class="form-group col-12">
+                  <label for="exam-physical">
+                    <span>4. Physical Examination (การตรวจร่างกายทั่วไป)</span>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">โครงสร้างกระดูก, สัญญาณทางระบบประสาท (Reflex, Sensation, Dermatome, Myotome)</span>
+                  </label>
+                  <textarea id="exam-physical" rows="3" placeholder="ผลการตรวจร่างกายทั่วไป Reflex (Biceps 2+, Knee jerk 2+), Sensation intact, Motor power grade 5..."></textarea>
+                </div>
+
+                <!-- 5. Active test & Passive test -->
+                <div class="form-group col-6">
+                  <label for="exam-active-test">
+                    <span>5.1 Active test</span>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">การเคลื่อนไหวด้วยตนเอง & Pain arc</span>
+                  </label>
+                  <textarea id="exam-active-test" rows="3" placeholder="ผลการทดสอบการเคลื่อนไหวด้วยตัวเอง มุมที่เริ่มมีอาการปวด Pain arc..."></textarea>
+                </div>
+
+                <div class="form-group col-6">
+                  <label for="exam-passive-test">
+                    <span>5.2 Passive test</span>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">การเคลื่อนไหวโดยผู้ตรวจ & End-feel</span>
+                  </label>
+                  <textarea id="exam-passive-test" rows="3" placeholder="ผลการทดสอบการเคลื่อนไหวโดยผู้ตรวจ End-feel (Soft, Firm, Hard, Empty)..."></textarea>
+                </div>
+
+                <!-- 6. Special test -->
+                <div class="form-group col-12">
+                  <label for="exam-special-test">
+                    <span>6. Special test (การทดสอบเฉพาะทาง)</span>
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">เช่น Spurling's test, SLR test, Phalen's test, Neer's test, FABER test, Hawkins-Kennedy</span>
+                  </label>
+                  <textarea id="exam-special-test" rows="3" placeholder="เช่น Spurling's test: Positive (Right), SLR test: Negative, Phalen's test: Negative..."></textarea>
+                </div>
+
+                <!-- 7. Diagnosis & Treatment Plan -->
+                <div class="form-group col-6">
+                  <label for="exam-diagnosis">
+                    <span>7.1 Diagnosis (การวินิจฉัยทางกายภาพบำบัด) <span class="req">*</span></span>
+                  </label>
+                  <textarea id="exam-diagnosis" rows="4" placeholder="ระบุการวินิจฉัยโรค หรือกลุ่มอาการทางกายภาพบำบัด เช่น Myofascial Pain Syndrome, Cervical Spondylosis, Lumbar Disc Herniation..." required></textarea>
+                </div>
+
+                <div class="form-group col-6">
+                  <label for="exam-treatment">
+                    <span>7.2 Treatment & Plan (การรักษาและแผนการฟื้นฟู)</span>
+                  </label>
+                  <textarea id="exam-treatment" rows="4" placeholder="ระบุแผนการรักษา เครื่องมือที่ใช้ (Ultrasound, Laser, Shockwave, Traction), Manual Therapy, และ Therapeutic Exercise..."></textarea>
+                </div>
+
+              </div>
+
+              <!-- Action Buttons -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                <button type="button" class="btn btn-outline" id="btn-back-to-patient">
+                  <i class="fa-solid fa-arrow-left"></i> ย้อนกลับไปข้อมูลคนไข้
+                </button>
+
+                <div style="display: flex; gap: 12px;">
+                  <button type="button" class="btn btn-primary" id="btn-save-from-diag">
+                    <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลคนไข้ทั้งหมด
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Google Drive Attachments Card -->
+            <div class="card-panel drive-attachment-card" style="margin-top: 24px;">
+              <div class="gold-divider-title">
+                <div class="title-text">
+                  <i class="fa-brands fa-google-drive" style="color: #4285F4;"></i>
+                  <span>เอกสารและภาพถ่ายทางการแพทย์ใน Google Drive (Medical Files & Attachments)</span>
+                </div>
+                <div class="gold-divider-line"></div>
+              </div>
+
+              <!-- Header bar with patient context & direct Drive folder link -->
+              <div class="drive-header-bar">
+                <div class="drive-hn-badge">
+                  <i class="fa-solid fa-folder-tree" style="color: var(--primary-light);"></i>
+                  <span>โฟลเดอร์คนไข้: <strong id="drive-current-hn">-</strong> (<span id="drive-current-name">ยังไม่ได้ระบุคนไข้</span>)</span>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                  <a href="#" target="_blank" class="drive-link-btn" id="drive-patient-folder-link" style="display: none;">
+                    <i class="fa-brands fa-google-drive"></i> เปิดโฟลเดอร์ใน Google Drive
+                  </a>
+                  <button type="button" class="btn btn-sm btn-outline" id="btn-refresh-files" title="โหลดรายการไฟล์ใหม่">
+                    <i class="fa-solid fa-arrows-rotate"></i> รีเฟรช
+                  </button>
+                </div>
+              </div>
+
+              <!-- Upload Area -->
+              <div class="drive-dropzone-wrap">
+                <!-- Dropzone Box -->
+                <div class="drive-dropzone" id="drive-dropzone">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <div class="dz-title">คลิกเลือกไฟล์ หรือลากไฟล์มาวางที่นี่</div>
+                  <div class="dz-subtitle">รองรับรูปภาพ (JPG, PNG), เอกสารผลตรวจ (PDF), MRI, X-Ray (สูงสุด 25MB)</div>
+                  <input type="file" id="drive-file-input" accept="image/*,.pdf,.doc,.docx" style="display: none;">
+                </div>
+
+                <!-- File metadata and upload button -->
+                <div class="drive-upload-meta">
+                  <div id="drive-selected-preview" style="display: none;">
+                    <div class="drive-selected-preview">
+                      <i class="fa-solid fa-file-medical file-icon" id="preview-file-icon"></i>
+                      <div class="file-details">
+                        <div class="file-name" id="preview-file-name">-</div>
+                        <div class="file-size" id="preview-file-size">-</div>
+                      </div>
+                      <button type="button" id="btn-clear-file" style="background:none;border:none;color:#94a3b8;cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label for="drive-file-category" style="font-size: 12px;">หมวดหมู่ / คำอธิบายไฟล์</label>
+                    <div style="display: flex; gap: 8px;">
+                      <select id="drive-file-category" style="padding: 7px 10px; font-size: 12.5px;">
+                        <option value="ภาพ X-Ray (รังสีวินิจฉัย)">ภาพ X-Ray (รังสีวินิจฉัย)</option>
+                        <option value="ผลตรวจคลื่นแม่เหล็กไฟฟ้า (MRI)">ผลตรวจคลื่นแม่เหล็กไฟฟ้า (MRI)</option>
+                        <option value="ภาพถ่ายประเมินท่าทาง (Posture / Gait)">ภาพถ่ายประเมินท่าทาง (Posture / Gait)</option>
+                        <option value="ใบส่งตัว / ประวัติจากแพทย์">ใบส่งตัว / ประวัติจากแพทย์</option>
+                        <option value="เอกสารเวชระเบียน A4">เอกสารเวชระเบียน A4</option>
+                        <option value="อื่นๆ">อื่นๆ (ระบุในช่อง)</option>
+                      </select>
+                      <input type="text" id="drive-file-custom-desc" placeholder="คำอธิบายเพิ่มเติม..." style="padding: 7px 10px; font-size: 12.5px; flex: 1;">
+                    </div>
+                  </div>
+
+                  <button type="button" class="btn btn-primary" id="btn-upload-drive" disabled style="width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> อัปโหลดเข้า Google Drive ของคนไข้
+                  </button>
+                </div>
+              </div>
+
+              <!-- Uploaded Files Grid -->
+              <div>
+                <div style="font-weight: 700; font-size: 13.5px; color: var(--primary-color); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                  <span><i class="fa-solid fa-paperclip"></i> รายการไฟล์ที่อัปโหลดแล้ว</span>
+                  <span id="drive-files-count-badge" style="font-size: 11.5px; font-weight: normal; color: var(--text-muted);">0 รายการ</span>
+                </div>
+
+                <div class="drive-files-grid" id="drive-files-container">
+                  <div class="drive-empty-files">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <div>ยังไม่มีไฟล์ที่แนบสำหรับคนไข้รายนี้</div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">เลือกไฟล์ด้านบนเพื่ออัปโหลดเก็บเข้าโฟลเดอร์ Google Drive โดยตรง</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </form>
+        </section>
+
+
+        <!-- ===================================================================
+             TAB 3: SEARCH & DATABASE
+             =================================================================== -->
+        <section class="tab-pane" id="search-tab">
+          
+          <div class="card-panel">
+            <div class="gold-divider-title">
+              <div class="title-text">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>ค้นหาข้อมูลและเวชระเบียนคนไข้</span>
+              </div>
+              <div class="gold-divider-line"></div>
+            </div>
+
+            <!-- Toolbar with Search Input -->
+            <div class="search-toolbar">
+              <div class="quick-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="table-search-input" placeholder="ค้นหาด่วนจาก ชื่อ, นามสกุล, เบอร์โทร, หรือ HN...">
+              </div>
+
+              <div class="table-stats-badge" id="record-count-text">
+                พบข้อมูลคนไข้ 0 รายการ
+              </div>
+            </div>
+
+            <!-- Date Filter Bar -->
+            <div class="date-filter-bar">
+              <div class="date-filter-chips">
+                <span class="filter-label"><i class="fa-solid fa-filter"></i> วันที่รักษา:</span>
+                <button type="button" class="filter-chip active" data-filter="all">ทั้งหมด</button>
+                <button type="button" class="filter-chip" data-filter="today">วันนี้</button>
+                <button type="button" class="filter-chip" data-filter="7days">7 วันล่าสุด</button>
+                <button type="button" class="filter-chip" data-filter="month">เดือนนี้</button>
+                <button type="button" class="filter-chip" data-filter="custom">
+                  <i class="fa-regular fa-calendar-days"></i> กำหนดช่วงวัน
+                </button>
+              </div>
+
+              <!-- Custom Date Range Inputs (shown when custom is active) -->
+              <div class="custom-date-range" id="custom-date-range" style="display: none;">
+                <div class="date-range-item">
+                  <label for="filter-date-from">จาก:</label>
+                  <input type="date" id="filter-date-from">
+                </div>
+                <div class="date-range-item">
+                  <label for="filter-date-to">ถึง:</label>
+                  <input type="date" id="filter-date-to">
+                </div>
+                <button type="button" class="btn-clear-date" id="btn-clear-custom-date" title="ล้างช่วงวันที่">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Table of Patients -->
+            <div class="table-responsive">
+              <table class="clinic-table">
+                <thead>
+                  <tr>
+                    <th class="th-sortable" data-sort="hn" style="width: 110px;" title="คลิกเพื่อเรียงลำดับ HN">
+                      <div class="th-content">
+                        <span>HN</span>
+                        <i class="fa-solid fa-sort sort-icon" id="sort-icon-hn"></i>
+                      </div>
+                    </th>
+                    <th class="th-sortable" data-sort="treatmentDate" style="width: 135px;" title="คลิกเพื่อเรียงลำดับวันที่รักษา">
+                      <div class="th-content">
+                        <span>วันที่รักษา</span>
+                        <i class="fa-solid fa-sort-down sort-icon" id="sort-icon-treatmentDate"></i>
+                      </div>
+                    </th>
+                    <th class="th-sortable" data-sort="name" style="width: 190px;" title="คลิกเพื่อเรียงลำดับชื่อคนไข้">
+                      <div class="th-content">
+                        <span>ชื่อ-นามสกุล</span>
+                        <i class="fa-solid fa-sort sort-icon" id="sort-icon-name"></i>
+                      </div>
+                    </th>
+                    <th style="width: 130px;">เบอร์โทร</th>
+                    <th>การวินิจฉัย (Diagnosis)</th>
+                    <th style="width: 170px;">ข้อควรระวัง / แพ้ยา</th>
+                    <th style="width: 220px; text-align: center;">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="patient-table-tbody">
+                  <!-- Generated by JavaScript -->
+                  <tr>
+                    <td colspan="7" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                      <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 8px;"></i>
+                      <p>กำลังโหลดข้อมูล...</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Controls Bar -->
+            <div class="table-pagination-bar" id="table-pagination-bar">
+              <div class="pagination-rows-per-page">
+                <label for="rows-per-page-select">แสดงแถวต่อหน้า:</label>
+                <select id="rows-per-page-select">
+                  <option value="10">10</option>
+                  <option value="20" selected>20</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span class="pagination-info" id="pagination-info">แสดง 0 รายการ</span>
+              </div>
+
+              <div class="pagination-nav">
+                <button type="button" class="btn-page-nav" id="btn-first-page" title="หน้าแรก" disabled>
+                  <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button type="button" class="btn-page-nav" id="btn-prev-page" title="หน้าก่อนหน้า" disabled>
+                  <i class="fa-solid fa-angle-left"></i> ก่อนหน้า
+                </button>
+                
+                <div class="pagination-pages" id="pagination-page-numbers">
+                  <!-- Generated by JS -->
+                </div>
+
+                <button type="button" class="btn-page-nav" id="btn-next-page" title="หน้าถัดไป" disabled>
+                  ถัดไป <i class="fa-solid fa-angle-right"></i>
+                </button>
+                <button type="button" class="btn-page-nav" id="btn-last-page" title="หน้าสุดท้าย" disabled>
+                  <i class="fa-solid fa-angles-right"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ===================================================================
+             TAB 4: APPOINTMENT SCHEDULE (GOOGLE CALENDAR)
+             =================================================================== -->
+        <section class="tab-pane" id="appointment-tab">
+          
+          <div class="card-panel">
+            <div class="gold-divider-title">
+              <div class="title-text">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>ตารางนัดหมายคนไข้ (Google Calendar Schedule)</span>
+              </div>
+              <div class="gold-divider-line"></div>
+            </div>
+
+            <!-- Appointment Toolbar -->
+            <div class="appointment-toolbar">
+              <!-- Top Row: View Switcher & Action Buttons -->
+              <div class="appt-toolbar-top-row">
+                <!-- View Switcher -->
+                <div class="appt-view-switcher">
+                  <button type="button" class="btn-view-toggle active" id="btn-view-agenda" data-view="agenda" title="แสดงรายการนัดหมายแบบการ์ด">
+                    <i class="fa-solid fa-list-check"></i> รายการนัดหมาย
+                  </button>
+                  <button type="button" class="btn-view-toggle" id="btn-view-calendar" data-view="calendar" title="แสดงปฏิทิน Google Calendar เต็มรูปแบบ">
+                    <i class="fa-solid fa-calendar-days"></i> ปฏิทิน Google Calendar
+                  </button>
+                </div>
+
+                <div class="appointment-toolbar-right">
+                  <button type="button" class="btn btn-outline btn-sm" id="btn-refresh-appointments" title="ดึงข้อมูลล่าสุดจาก Google Calendar">
+                    <i class="fa-solid fa-arrows-rotate"></i> รีเฟรช
+                  </button>
+                  <button type="button" class="btn btn-primary btn-sm" id="btn-new-calendar-event" title="สร้างนัดหมายคนไข้ใหม่ลง Google Calendar โดยตรง">
+                    <i class="fa-solid fa-calendar-plus"></i> สร้างนัดหมายใหม่
+                  </button>
+                  <a href="https://calendar.google.com" target="_blank" class="btn btn-outline btn-sm" id="btn-open-google-calendar" title="เปิดปฏิทิน Google Calendar ในแท็บใหม่">
+                    <i class="fa-brands fa-google"></i> เปิด Google Calendar
+                  </a>
+                </div>
+              </div>
+
+              <!-- Filter & Search Controls Bar -->
+              <div class="appt-controls-bar" id="appt-controls-bar">
+                <!-- Search appointments (prominent & well-aligned) -->
+                <div class="appt-search-box" id="appt-search-wrap">
+                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                  <input type="text" id="appt-search-input" placeholder="ค้นหาชื่อคนไข้, HN, หัวข้อนัดหมาย...">
+                  <button type="button" class="btn-clear-search" id="btn-clear-appt-search" title="ล้างการค้นหา" style="display: none;">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+
+                <!-- Quick Date Filter Chips (removed 'ทั้งหมด' to prevent overload, 'วันนี้' active by default) -->
+                <div class="date-filter-chips" id="appt-date-chips-wrap">
+                  <button type="button" class="filter-chip active" data-appt-filter="today">วันนี้</button>
+                  <button type="button" class="filter-chip" data-appt-filter="upcoming7">7 วันข้างหน้า</button>
+                  <button type="button" class="filter-chip" data-appt-filter="thisMonth">เดือนนี้</button>
+                  <button type="button" class="filter-chip" data-appt-filter="custom">
+                    <i class="fa-regular fa-calendar-days"></i> เลือกช่วงวัน
+                  </button>
+                </div>
+
+                <!-- Custom Range Date Picker for Appointments -->
+                <div class="custom-date-range" id="appt-custom-date-range" style="display: none;">
+                  <div class="date-range-item">
+                    <label for="appt-date-from">จาก:</label>
+                    <input type="date" id="appt-date-from">
+                  </div>
+                  <div class="date-range-item">
+                    <label for="appt-date-to">ถึง:</label>
+                    <input type="date" id="appt-date-to">
+                  </div>
+                  <button type="button" class="btn-clear-date" id="btn-clear-appt-date" title="ล้างช่วงวันที่">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calendar Info / Sync Status Bar -->
+            <div class="appt-status-bar" id="appt-status-bar">
+              <div class="appt-status-info">
+                <span class="status-dot" id="appt-sync-dot"></span>
+                <span id="appt-calendar-name">กำลังเชื่อมต่อ Google Calendar...</span>
+              </div>
+              <div class="appt-stats-summary" id="appt-stats-summary">
+                พบ 0 นัดหมาย
+              </div>
+            </div>
+
+            <!-- Appointment Quick Summary Cards -->
+            <div class="appt-stat-cards-grid" id="appt-stat-cards-wrap">
+              <div class="appt-stat-card appt-stat-today">
+                <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                <div class="stat-content">
+                  <div class="stat-number" id="stat-appt-today">0</div>
+                  <div class="stat-label">นัดหมายวันนี้</div>
+                </div>
+              </div>
+              <div class="appt-stat-card appt-stat-week">
+                <div class="stat-icon"><i class="fa-solid fa-calendar-week"></i></div>
+                <div class="stat-content">
+                  <div class="stat-number" id="stat-appt-upcoming">0</div>
+                  <div class="stat-label">7 วันข้างหน้า</div>
+                </div>
+              </div>
+              <div class="appt-stat-card appt-stat-month">
+                <div class="stat-icon"><i class="fa-solid fa-calendar"></i></div>
+                <div class="stat-content">
+                  <div class="stat-number" id="stat-appt-month">0</div>
+                  <div class="stat-label">เดือนนี้</div>
+                </div>
+              </div>
+              <div class="appt-stat-card appt-stat-total">
+                <div class="stat-icon"><i class="fa-solid fa-list-check"></i></div>
+                <div class="stat-content">
+                  <div class="stat-number" id="stat-appt-total">0</div>
+                  <div class="stat-label">นัดหมายทั้งหมด</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Appointments List / Timeline Container (Agenda View) -->
+            <div class="appt-schedule-container" id="appt-schedule-container">
+              <!-- Dynamically generated list -->
+              <div class="appt-loading-placeholder">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>กำลังโหลดข้อมูลตารางนัดหมายจาก Google Calendar...</span>
+              </div>
+            </div>
+
+            <!-- Google Calendar iFrame Embed View Container -->
+            <div class="appt-calendar-embed-container" id="appt-calendar-embed-container" style="display: none;">
+              <div class="calendar-embed-header">
+                <div class="calendar-embed-title">
+                  <i class="fa-brands fa-google" style="color: #4285f4; font-size: 18px;"></i>
+                  <span>ปฏิทิน Google Calendar ของคลินิก (Interactive Calendar)</span>
+                </div>
+                <div class="calendar-embed-actions">
+                  <button type="button" class="btn btn-outline btn-sm" id="btn-reload-calendar-iframe" title="โหลดปฏิทินใหม่">
+                    <i class="fa-solid fa-arrows-rotate"></i> โหลดใหม่
+                  </button>
+                  <a href="https://calendar.google.com" target="_blank" class="btn btn-outline btn-sm" title="เปิดดูใน Google Calendar เต็มจอ">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> เปิดแท็บใหม่
+                  </a>
+                </div>
+              </div>
+              <div class="calendar-iframe-wrapper">
+                <iframe id="google-calendar-iframe" src="about:blank" frameborder="0" scrolling="no"></iframe>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ===================================================================
+             TAB 5: BILLING & RECEIPTS (CASHIER & MONTHLY DASHBOARD)
+             =================================================================== -->
+        <section class="tab-pane" id="billing-tab">
+          
+          <div class="card-panel">
+            <div class="gold-divider-title">
+              <div class="title-text">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>แดชบอร์ดสรุปรายได้และสถิติประจำเดือน (Monthly Revenue Dashboard)</span>
+              </div>
+              <div class="gold-divider-line"></div>
+            </div>
+
+            <!-- Dashboard Filter & Header -->
+            <div class="billing-dash-filter-bar">
+              <div class="billing-month-selector-wrap">
+                <label for="billing-month-select"><i class="fa-regular fa-calendar-days"></i> เลือกเดือนที่ต้องการดูข้อมูล:</label>
+                <select id="billing-month-select" class="billing-month-select">
+                  <!-- Populated by JS -->
+                </select>
+              </div>
+              <div class="billing-dash-actions">
+                <button type="button" class="btn btn-outline btn-sm" id="btn-export-billing-csv" title="ส่งออกข้อมูลบิลเป็นไฟล์ CSV">
+                  <i class="fa-solid fa-file-csv"></i> ส่งออก CSV
+                </button>
+              </div>
+            </div>
+
+            <!-- Monthly Stat Cards -->
+            <div class="billing-stat-cards-grid">
+              <div class="billing-stat-card card-revenue">
+                <div class="b-stat-icon"><i class="fa-solid fa-coins"></i></div>
+                <div class="b-stat-info">
+                  <div class="b-stat-val" id="b-stat-revenue">฿0</div>
+                  <div class="b-stat-label">ยอดรวมรายได้เดือนนี้</div>
+                </div>
+              </div>
+
+              <div class="billing-stat-card card-patients">
+                <div class="b-stat-icon"><i class="fa-solid fa-users"></i></div>
+                <div class="b-stat-info">
+                  <div class="b-stat-val" id="b-stat-patients">0 คน</div>
+                  <div class="b-stat-label">จำนวนผู้รับการรักษา (<span id="b-stat-bills-count">0 บิล</span>)</div>
+                </div>
+              </div>
+
+              <div class="billing-stat-card card-avg">
+                <div class="b-stat-icon"><i class="fa-solid fa-calculator"></i></div>
+                <div class="b-stat-info">
+                  <div class="b-stat-val" id="b-stat-avg">฿0</div>
+                  <div class="b-stat-label">ยอดเฉลี่ยต่อบิล</div>
+                </div>
+              </div>
+
+              <div class="billing-stat-card card-payment">
+                <div class="b-stat-icon"><i class="fa-solid fa-credit-card"></i></div>
+                <div class="b-stat-info">
+                  <div class="b-stat-payment-breakdown">
+                    <span title="เงินสด"><i class="fa-solid fa-money-bill-wave" style="color: #10b981;"></i> สด: <strong id="b-stat-cash">฿0</strong></span>
+                    <span title="เงินโอน/QR"><i class="fa-solid fa-qrcode" style="color: #3b82f6;"></i> โอน: <strong id="b-stat-transfer">฿0</strong></span>
+                    <span title="บัตรเครดิต"><i class="fa-solid fa-credit-card" style="color: #8b5cf6;"></i> บัตร: <strong id="b-stat-card">฿0</strong></span>
+                  </div>
+                  <div class="b-stat-label">สัดส่วนช่องทางชำระเงิน</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cashier & Create Bill Panel -->
+          <div class="card-panel" style="margin-top: 24px;">
+            <div class="gold-divider-title">
+              <div class="title-text">
+                <i class="fa-solid fa-cash-register"></i>
+                <span>คิดเงิน / ออกบิลใหม่ (Cashier & Create Bill)</span>
+              </div>
+              <div class="gold-divider-line"></div>
+            </div>
+
+            <!-- Patient Selection & Bill Meta -->
+            <div class="cashier-meta-grid">
+              <div class="form-group col-6" style="position: relative;">
+                <label for="bill-patient-search"><i class="fa-solid fa-user-injured"></i> เลือกคนไข้ผู้รับบริการ <span class="req">*</span></label>
+                <div class="appt-patient-search-wrap">
+                  <input type="text" id="bill-patient-search" placeholder="พิมพ์ชื่อ, นามสกุล หรือ HN เพื่อเลือกคนไข้..." autocomplete="off">
+                  <button type="button" class="btn-clear-search" id="btn-clear-bill-patient" title="ล้างการเลือกคนไข้" style="display: none; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px;">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+                <div class="appt-patient-dropdown" id="bill-patient-dropdown" style="display: none;"></div>
+                <input type="hidden" id="bill-selected-hn" value="">
+                <input type="hidden" id="bill-selected-name" value="">
+                <input type="hidden" id="bill-selected-phone" value="">
+                <div class="quick-patient-container" id="quick-patient-container" style="display: none; margin-top: 6px;">
+                  <span class="quick-patient-title"><i class="fa-solid fa-bolt" style="color: var(--gold-dark); font-size: 11px;"></i> คนไข้ตรวจ/นัดวันนี้ (คลิกเลือกด่วน):</span>
+                  <div class="quick-patient-chips" id="quick-patient-chips"></div>
+                </div>
+              </div>
+
+              <div class="form-group col-3">
+                <label for="bill-date"><i class="fa-regular fa-calendar-check"></i> วันที่ออกบิล <span class="req">*</span></label>
+                <input type="date" id="bill-date" required>
+              </div>
+
+              <div class="form-group col-3">
+                <label for="bill-cashier-name"><i class="fa-solid fa-user-doctor"></i> ผู้บันทึก / ผู้รับเงิน</label>
+                <input type="text" id="bill-cashier-name" placeholder="ชื่อผู้รับเงิน" value="นักกายภาพบำบัด">
+              </div>
+            </div>
+
+            <!-- Quick Treatment & Exercise Catalog (Presets) -->
+            <div class="catalog-section">
+              <div class="catalog-header">
+                <span class="catalog-title"><i class="fa-solid fa-list-check"></i> คลิกเลือกรายการเพื่อเพิ่มลงในบิล (Treatment & Exercise Rates):</span>
+                <span class="catalog-hint">* สามารถแก้ไขราคาต่อหน่วย และจำนวนในตารางด้านล่างได้อิสระ</span>
+              </div>
+
+              <div class="catalog-columns-grid">
+                <!-- Column 1: TREATMENT -->
+                <div class="catalog-col">
+                  <div class="catalog-col-title">
+                    <i class="fa-solid fa-hand-holding-medical"></i> TREATMENT (การรักษาและหัตถการ)
+                  </div>
+                  <div class="catalog-buttons-list">
+                    <button type="button" class="btn-catalog-item" data-name="ตรวจร่างกาย (Physiotherapy examination & Postural assessment)" data-price="200" data-cat="treatment">
+                      <span class="item-name">ตรวจร่างกาย (Physiotherapy examination & Postural assessment)</span>
+                      <span class="item-price">200 ฿</span>
+                    </button>
+                    <button type="button" class="btn-catalog-item" data-name="นวด (Myofascial release) 1.30 ชม. (Sport massage, Myofascial release)" data-price="800" data-cat="treatment">
+                      <span class="item-name">นวด (Myofascial release) 1.30 ชม.</span>
+                      <span class="item-price">800 ฿</span>
+                    </button>
+                    <button type="button" class="btn-catalog-item" data-name="เทปบำบัด 50 ซม. (Kinesio tape)" data-price="100" data-cat="treatment">
+                      <span class="item-name">เทปบำบัด 50 ซม. (Kinesio tape)</span>
+                      <span class="item-price">100 ฿</span>
+                    </button>
+                    <button type="button" class="btn-catalog-item" data-name="ครอบถ้วย ต่อจุด (Cupping)" data-price="200" data-cat="treatment">
+                      <span class="item-name">ครอบถ้วย ต่อจุด (Cupping)</span>
+                      <span class="item-price">200 ฿</span>
+                    </button>
+                    <button type="button" class="btn-catalog-item" data-name="ดัดและปรับข้อต่อ ต่อจุด (Mobilization Technique)" data-price="200" data-cat="treatment">
+                      <span class="item-name">ดัดและปรับข้อต่อ ต่อจุด (Mobilization Technique)</span>
+                      <span class="item-price">200 ฿</span>
+                    </button>
+                    <button type="button" class="btn-catalog-item" data-name="อัลตราซาวด์ 5 นาที (Ultrasound Therapy)" data-price="100" data-cat="treatment">
+                      <span class="item-name">อัลตราซาวด์ 5 นาที (Ultrasound Therapy)</span>
+                      <span class="item-price">100 ฿</span>
+                    </button>
+                    <button type="button" class="btn-catalog-item" data-name="ไฟฟ้าบำบัด 20 นาที (Electro Therapy)" data-price="500" data-cat="treatment">
+                      <span class="item-name">ไฟฟ้าบำบัด 20 นาที (Electro Therapy)</span>
+                      <span class="item-price">500 ฿</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Column 2: EXERCISE -->
+                <div class="catalog-col">
+                  <div class="catalog-col-title">
+                    <i class="fa-solid fa-person-walking"></i> EXERCISE (การออกกำลังกายฟื้นฟู)
+                  </div>
+                  <div class="catalog-buttons-list">
+                    <button type="button" class="btn-catalog-item" data-name="Corrective functional exercise (ออกกำลังกายเพื่อปรับท่าทางและลดอาการปวด)" data-price="800" data-cat="exercise">
+                      <span class="item-name">Corrective functional exercise</span>
+                      <span class="item-price">800 - 1,200 ฿</span>
+                    </button>
+                    <button type="button" class="btn-catalog-item" data-name="Scoliosis exercise (ออกกำลังกายในกระดูกสันหลังคด)" data-price="800" data-cat="exercise">
+                      <span class="item-name">Scoliosis exercise (กระดูกสันหลังคด)</span>
+                      <span class="item-price">800 ฿</span>
+                    </button>
+                    <button type="button" class="btn-catalog-item" data-name="Rehab exercise (ออกกำลังกายเพื่อฟื้นฟู เหมาะกับคนหลังผ่าตัด/บาดเจ็บ)" data-price="800" data-cat="exercise">
+                      <span class="item-name">Rehab exercise (หลังผ่าตัด/บาดเจ็บ)</span>
+                      <span class="item-price">800 - 1,000 ฿</span>
+                    </button>
+                    <button type="button" class="btn-catalog-item" data-name="Stroke and Paraplegic rehab (ออกกำลังกายเพื่อฟื้นฟูผู้ป่วยอัมพาต)" data-price="1000" data-cat="exercise">
+                      <span class="item-name">Stroke & Paraplegic rehab (ผู้ป่วยอัมพาต)</span>
+                      <span class="item-price">1,000 ฿</span>
+                    </button>
+                    
+                    <!-- Custom Item Trigger -->
+                    <div class="catalog-custom-item-box">
+                      <button type="button" class="btn btn-outline btn-sm" id="btn-add-custom-item" style="width: 100%; margin-top: 8px;">
+                        <i class="fa-solid fa-plus"></i> + เพิ่มรายการรักษา / อุปกรณ์อื่น ๆ เอง
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bill Line Items Table -->
+            <div class="bill-table-wrap">
+              <table class="bill-table" id="bill-items-table">
+                <thead>
+                  <tr>
+                    <th style="width: 45px; text-align: center;">#</th>
+                    <th>รายการตรวจรักษา / หัตถการ (Description)</th>
+                    <th style="width: 150px; text-align: right;">ราคาต่อหน่วย (฿)</th>
+                    <th style="width: 110px; text-align: center;">จำนวน (Qty)</th>
+                    <th style="width: 150px; text-align: right;">จำนวนเงิน (฿)</th>
+                    <th style="width: 60px; text-align: center;">ลบ</th>
+                  </tr>
+                </thead>
+                <tbody id="bill-items-tbody">
+                  <tr class="bill-empty-row">
+                    <td colspan="6" style="text-align: center; padding: 28px; color: var(--text-muted);">
+                      <i class="fa-solid fa-basket-shopping" style="font-size: 24px; margin-bottom: 6px; display: block; color: #cbd5e1;"></i>
+                      ยังไม่มีรายการในบิล — กรุณาคลิกเลือกรายการด้านบน หรือกดเพิ่มรายการเอง
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Bill Summary & Calculation Row -->
+            <div class="bill-bottom-grid">
+              <div class="bill-notes-col">
+                <div class="form-group">
+                  <label for="bill-notes"><i class="fa-regular fa-comment-dots"></i> หมายเหตุเพิ่มเติมในใบเสร็จ (Optional)</label>
+                  <textarea id="bill-notes" rows="3" placeholder="เช่น คอร์สกายภาพบำบัดครั้งที่ 1/5, ส่วนลดพิเศษผู้สูงอายุ..."></textarea>
+                </div>
+                <div class="form-group" style="margin-top: 10px;">
+                  <label><i class="fa-solid fa-money-check-dollar"></i> ช่องทางชำระเงิน <span class="req">*</span></label>
+                  <div class="payment-method-radios">
+                    <label class="payment-radio-label">
+                      <input type="radio" name="bill-payment-method" value="เงินสด" checked>
+                      <span><i class="fa-solid fa-money-bill-wave"></i> เงินสด</span>
+                    </label>
+                    <label class="payment-radio-label">
+                      <input type="radio" name="bill-payment-method" value="เงินโอน / PromptPay">
+                      <span><i class="fa-solid fa-qrcode"></i> โอนเงิน / QR</span>
+                    </label>
+                    <label class="payment-radio-label">
+                      <input type="radio" name="bill-payment-method" value="บัตรเครดิต">
+                      <span><i class="fa-solid fa-credit-card"></i> บัตรเครดิต</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bill-calculation-col">
+                <div class="bill-calc-row">
+                  <span class="calc-label">ยอดรวมก่อนลด (Subtotal):</span>
+                  <span class="calc-val" id="bill-subtotal-display">฿0.00</span>
+                </div>
+
+                <div class="bill-calc-row discount-row">
+                  <div class="discount-type-toggle">
+                    <span class="calc-label">ส่วนลด:</span>
+                    <div class="discount-toggle-btns">
+                      <button type="button" class="btn-discount-type active" data-type="baht" id="btn-discount-baht">฿</button>
+                      <button type="button" class="btn-discount-type" data-type="percent" id="btn-discount-percent">%</button>
+                    </div>
+                  </div>
+                  <div class="discount-input-wrap">
+                    <input type="number" id="bill-discount-input" min="0" step="any" placeholder="0" value="0">
+                    <span class="discount-calculated-text" id="bill-discount-calc-display">-฿0.00</span>
+                  </div>
+                </div>
+
+                <div class="bill-calc-row grand-total-row">
+                  <span class="calc-label">ยอดสุทธิที่ต้องชำระ (Net Total):</span>
+                  <span class="calc-val-grand" id="bill-net-total-display">฿0.00</span>
+                </div>
+
+                <div class="bill-actions-row">
+                  <button type="button" class="btn btn-outline" id="btn-clear-bill" title="ล้างรายการทั้งหมดในบิล">
+                    <i class="fa-solid fa-rotate-left"></i> ล้างบิล
+                  </button>
+                  <button type="button" class="btn btn-outline" id="btn-save-bill-only" title="บันทึกข้อมูลเข้าสู่ระบบโดยไม่ต้องพิมพ์">
+                    <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูล
+                  </button>
+                  <button type="button" class="btn btn-primary" id="btn-save-print-bill" title="บันทึกข้อมูลและเปิดหน้าต่างพิมพ์ใบเสร็จ">
+                    <i class="fa-solid fa-print"></i> บันทึกและพิมพ์ใบเสร็จ
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Monthly Receipts History Panel -->
+          <div class="card-panel" style="margin-top: 24px;">
+            <div class="gold-divider-title">
+              <div class="title-text">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>ประวัติใบเสร็จรับเงินประจำเดือน (<span id="history-month-label">-</span>)</span>
+              </div>
+              <div class="gold-divider-line"></div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="clinic-table">
+                <thead>
+                  <tr>
+                    <th style="width: 140px;">เลขที่ใบเสร็จ</th>
+                    <th style="width: 130px;">วันที่ / เวลา</th>
+                    <th style="width: 110px;">HN</th>
+                    <th style="width: 180px;">ชื่อคนไข้</th>
+                    <th>รายการตรวจรักษา</th>
+                    <th style="width: 130px; text-align: right;">ยอดสุทธิ</th>
+                    <th style="width: 120px; text-align: center;">ชำระโดย</th>
+                    <th style="width: 160px; text-align: center;">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="receipts-history-tbody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Billing Pagination Controls -->
+            <div class="table-pagination-bar billing-pagination-bar" id="billing-pagination-bar" style="display: none;">
+              <div class="pagination-info" id="billing-pagination-info">
+                แสดง 0 รายการ
+              </div>
+              <div class="pagination-nav">
+                <button type="button" class="btn-page-nav" id="btn-billing-prev-page" title="หน้าก่อนหน้า" disabled>
+                  <i class="fa-solid fa-chevron-left"></i> ก่อนหน้า
+                </button>
+                <div class="pagination-pages" id="billing-pagination-pages"></div>
+                <button type="button" class="btn-page-nav" id="btn-billing-next-page" title="หน้าถัดไป" disabled>
+                  ถัดไป <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- =======================================================================
+       MODAL: DELETE CONFIRMATION
+       ======================================================================= -->
+  <div class="modal-backdrop" id="delete-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="color: var(--color-danger); display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-triangle-exclamation"></i> ยืนยันการลบข้อมูล
+        </h3>
+        <button class="modal-close-btn" id="btn-close-delete-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14.5px; color: #334155;">
+          คุณแน่ใจหรือไม่ว่าต้องการลบเวชระเบียนของคนไข้รายนี้?
+        </p>
+        <div style="margin-top: 14px; background: #fff1f2; border: 1px solid #fecdd3; padding: 12px 16px; border-radius: var(--radius-md);">
+          <div>HN: <strong id="del-hn-display" style="color: var(--primary-color);">-</strong></div>
+          <div style="margin-top: 4px;">ชื่อคนไข้: <strong id="del-name-display" style="color: #be123c;">-</strong></div>
+        </div>
+        <p style="font-size: 12px; color: #64748b; margin-top: 10px;">
+          * การดำเนินการนี้ไม่สามารถยกเลิกได้ ข้อมูลจะถูกลบออกจากฐานข้อมูลทันที
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btn-cancel-delete">ยกเลิก</button>
+        <button class="btn btn-danger" id="btn-confirm-delete">
+          <i class="fa-solid fa-trash-can"></i> ลบข้อมูลทันที
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL: GOOGLE SHEETS & GOOGLE DRIVE SETTINGS
+       ======================================================================= -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fa-brands fa-google-drive" style="color: #4285f4; font-size: 20px;"></i>
+          <h3>เชื่อมต่อ Google Sheets & Google Drive</h3>
+        </div>
+        <button class="modal-close-btn" id="btn-close-settings-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+        <!-- Apps Script Web App URL Input -->
+        <div class="form-group">
+          <label for="settings-api-url" style="font-weight: 700;">Google Apps Script Web App URL</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="url" id="settings-api-url" placeholder="https://script.google.com/macros/s/.../exec" style="flex: 1; min-width: 250px;">
+            <button type="button" class="btn btn-outline" id="btn-test-connection" style="flex-shrink: 0;">
+              <i class="fa-solid fa-plug"></i> ทดสอบการเชื่อมต่อ
+            </button>
+            <button type="button" class="btn btn-outline" id="btn-fix-hn" style="flex-shrink: 0;" title="แปลงเลข HN ทั้งหมดใน Google Sheets ให้เป็น 5 หลักมาตรฐาน (00001) และตั้งค่าข้อความ">
+              <i class="fa-solid fa-wrench"></i> ซ่อมแซม HN ใน Sheets
+            </button>
+          </div>
+          <small style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px; display: block;">
+            คัดลอก Web App URL (ลงท้ายด้วย /exec) ที่ได้จากการ Deploy ใน Google Apps Script มาวางที่นี่
+          </small>
+        </div>
+
+        <!-- Clinic API Key Input -->
+        <div class="form-group" style="margin-top: 14px;">
+          <label for="settings-api-key" style="font-weight: 700;">
+            <i class="fa-solid fa-key" style="color: var(--primary-light);"></i> รหัสคลินิก (Clinic API Key)
+          </label>
+          <input type="password" id="settings-api-key" placeholder="วางรหัสที่ได้จากการรัน setupClinicApiKey ใน Apps Script" autocomplete="off" spellcheck="false">
+          <small style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px; display: block;">
+            ป้องกันไม่ให้ผู้อื่นที่ได้ลิงก์ Web App ไปเข้าถึงข้อมูลคนไข้ ต้องใส่รหัสเดียวกันในทุกเครื่องของคลินิก
+          </small>
+        </div>
+
+        <!-- Google Calendar ID / Gmail Input -->
+        <div class="form-group" style="margin-top: 14px;">
+          <label for="settings-calendar-id" style="font-weight: 700;">
+            <i class="fa-brands fa-google" style="color: #4285f4;"></i> Google Calendar ID หรือ Gmail (สำหรับแสดงปฏิทินฝังในเว็บแอป)
+          </label>
+          <input type="text" id="settings-calendar-id" placeholder="เช่น yourclinic@gmail.com หรือ c_xxxxxxxxxx@group.calendar.google.com">
+          <small style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px; display: block;">
+            ระบุที่อยู่อีเมล Gmail หรือ รหัสปฏิทิน Google Calendar ที่ต้องการให้แสดงบนหน้าเว็บ (หากเว้นว่าง ระบบจะใช้ค่าเริ่มต้นจาก Google Apps Script)
+          </small>
+        </div>
+
+        <!-- Connection Test Result Box -->
+        <div class="connection-result-box" id="connection-result-box">
+          <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px;" id="conn-result-title">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>ผลการทดสอบการเชื่อมต่อ</span>
+          </div>
+          <div id="conn-result-message" style="margin-top: 4px; font-size: 12.5px;">-</div>
+          <div class="drive-status-grid" id="conn-result-details" style="display: none;">
+            <div class="drive-status-item">
+              <i class="fa-solid fa-table-cells" style="color: #0f766e;"></i>
+              <span>แผ่นงาน Sheets: <strong id="conn-sheet-name">-</strong></span>
+            </div>
+            <div class="drive-status-item">
+              <i class="fa-brands fa-google-drive" style="color: #0369a1;"></i>
+              <span>โฟลเดอร์ Drive: <strong id="conn-folder-name">-</strong></span>
+            </div>
+            <div class="drive-status-item">
+              <i class="fa-solid fa-user-group" style="color: #4338ca;"></i>
+              <span>จำนวนคนไข้ในระบบ: <strong id="conn-patients-count">0</strong> ราย</span>
+            </div>
+            <div class="drive-status-item">
+              <i class="fa-solid fa-stopwatch" style="color: #b45309;"></i>
+              <span>ความเร็วการตอบสนอง: <strong id="conn-latency">0</strong> ms</span>
+            </div>
+          </div>
+          <div id="conn-result-actions" style="margin-top: 8px; display: none;">
+            <a href="#" target="_blank" class="drive-link-btn" id="conn-drive-link">
+              <i class="fa-brands fa-google-drive"></i> เปิดโฟลเดอร์หลักใน Google Drive
+            </a>
+          </div>
+        </div>
+
+        <!-- 5-Step Instructions Card -->
+        <div class="setup-steps-box">
+          <div style="font-weight: 700; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-book-medical"></i>
+            <span>ขั้นตอนการผูกระบบ Google Sheets & Drive (ใช้เวลาเพียง 2 นาที):</span>
+          </div>
+          <ol>
+            <li>สร้างสเปรดชีตเปล่าใหม่ที่ <strong>Google Sheets</strong> (ตั้งชื่อ: <em>ระบบเวชระเบียน Merit Physiotherapy Clinic</em>)</li>
+            <li>ไปที่เมนู <strong>ส่วนขยาย (Extensions)</strong> &gt; <strong>Apps Script</strong></li>
+            <li>ลบโค้ดเดิมทั้งหมด แล้วคัดลอกโค้ดจากไฟล์ <code>google-apps-script.js</code> ในโฟลเดอร์โปรแกรมไปวาง</li>
+            <li>กดปุ่ม <strong>การใช้งานจริง (Deploy)</strong> มุมขวาบน &gt; เลือก <strong>การใช้งานจริงรายการใหม่ (New deployment)</strong> &gt; ชนิด: <strong>เว็บแอป (Web app)</strong></li>
+            <li>ตั้งค่า: Execute as: <strong>"ฉัน" (Me)</strong> และ Who has access: <strong>"ทุกคน" (Anyone)</strong> &gt; กดยืนยันสิทธิ์ &gt; นำ URL ที่ลงท้ายด้วย <code>/exec</code> มาวางในช่องด้านบน</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btn-cancel-settings">ยกเลิก</button>
+        <button class="btn btn-primary" id="btn-save-settings">
+          <i class="fa-solid fa-floppy-disk"></i> บันทึกการตั้งค่า
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL: A4 MEDICAL RECORD PRINT PREVIEW
+       ======================================================================= -->
+  <div class="modal-backdrop" id="print-modal">
+    <div class="modal-card a4-print-modal-card">
+      <div class="modal-header no-print">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-print" style="color: var(--primary-color);"></i>
+          <h3>พรีวิวเวชระเบียนคนไข้ A4 - Merit Physiotherapy Clinic</h3>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-primary" id="btn-save-doc-drive" style="background: #1e3a8a; border-color: #1e3a8a;">
+            <i class="fa-brands fa-google-drive"></i> บันทึกเข้า Drive
+          </button>
+          <button class="btn btn-gold" id="btn-trigger-print">
+            <i class="fa-solid fa-print"></i> สั่งพิมพ์ A4 (Print)
+          </button>
+          <button class="modal-close-btn" id="btn-close-print-modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <!-- Scrollable Preview Frame -->
+      <div class="a4-preview-scroll">
+        
+        <!-- The Printable A4 Sheet -->
+        <div class="a4-sheet" id="printable-a4-document">
+          
+          <!-- Clinic Letterhead Header -->
+          <div class="print-header">
+            <div class="print-header-left">
+              <img src="logo.png" alt="Merit Logo" class="print-header-logo">
+              <div>
+                <div class="print-clinic-name">MERIT PHYSIOTHERAPY CLINIC</div>
+                <div class="print-clinic-sub">คลินิกกายภาพบำบัดเมอริท</div>
+                <div class="print-clinic-address">ใบเวชระเบียนและบันทึกการตรวจประเมินทางกายภาพบำบัด (Physical Therapy Medical Record)</div>
+              </div>
+            </div>
+            <div class="print-doc-badge">
+              <span class="tag">OPD RECORD</span>
+              <div class="hn-text" id="p-print-hn">HN: 00001</div>
+            </div>
+          </div>
+
+          <!-- Section 1: Patient Demographics & Emergency -->
+          <div class="print-section">
+            <div class="print-section-title">
+              <span>ข้อมูลประวัติผู้ป่วย (PATIENT INFORMATION)</span>
+              <span style="font-size: 11px; font-weight: normal;" id="p-print-date">วันที่รักษา: -</span>
+            </div>
+            
+            <div class="print-grid-2">
+              <div class="print-data-row"><span class="lbl">ชื่อ-นามสกุล:</span> <span class="val" id="p-print-name">-</span></div>
+              <div class="print-data-row"><span class="lbl">เลขบัตรประชาชน:</span> <span class="val" id="p-print-id">-</span></div>
+              <div class="print-data-row"><span class="lbl">วันเกิด:</span> <span class="val" id="p-print-dob">-</span></div>
+              <div class="print-data-row"><span class="lbl">อายุ:</span> <span class="val" id="p-print-age">-</span> <span style="margin-left: 14px;" class="lbl">เพศ:</span> <span class="val" id="p-print-gender">-</span></div>
+              <div class="print-data-row"><span class="lbl">เบอร์โทรศัพท์:</span> <span class="val" id="p-print-phone">-</span></div>
+              <div class="print-data-row"><span class="lbl">เชื้อชาติ:</span> <span class="val" id="p-print-ethnicity">-</span></div>
+              <div class="print-data-row" style="grid-column: span 2;"><span class="lbl">ที่อยู่:</span> <span class="val" id="p-print-address">-</span></div>
+              <div class="print-data-row" style="grid-column: span 2;"><span class="lbl">ผู้ติดต่อฉุกเฉิน:</span> <span class="val" id="p-print-emergency">-</span></div>
+            </div>
+          </div>
+
+          <!-- Section 2: Vital Signs & BMI -->
+          <div class="print-section">
+            <div class="print-section-title">
+              <span>สัญญาณชีพ & ดัชนีมวลกาย (VITAL SIGNS & BMI)</span>
+            </div>
+            <div class="print-grid-4" style="background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 4px;">
+              <div class="print-data-row"><span class="lbl">BP:</span> <span class="val" id="p-print-bp">-</span></div>
+              <div class="print-data-row"><span class="lbl">PR:</span> <span class="val" id="p-print-pr">-</span></div>
+              <div class="print-data-row"><span class="lbl">Weight / Height:</span> <span class="val" id="p-print-wh">-</span></div>
+              <div class="print-data-row"><span class="lbl">BMI:</span> <span class="val" id="p-print-bmi">-</span></div>
+            </div>
+          </div>
+
+          <!-- Section 3: Alerts (Drug Allergy & Contraindications) -->
+          <div class="print-alert-row">
+            <div class="print-box-yellow">
+              <strong><i class="fa-solid fa-triangle-exclamation"></i> แพ้ยา (Drug Allergy):</strong>
+              <div id="p-print-allergy" style="margin-top: 2px;">-</div>
+            </div>
+            <div class="print-box-pink">
+              <strong><i class="fa-solid fa-ban"></i> ข้อห้าม / ควรระวัง (Contraindications & Precautions):</strong>
+              <div id="p-print-contraindications" style="margin-top: 2px;">-</div>
+            </div>
+          </div>
+
+          <!-- Section 4: History & Subjective Examination -->
+          <div class="print-section">
+            <div class="print-section-title">
+              <span>ประวัติการเจ็บป่วย & SUBJECTIVE EXAMINATION</span>
+            </div>
+            <div class="print-exam-box">
+              <strong>โรคประจำตัว:</strong> <span id="p-print-underlying">-</span>
+            </div>
+            <div class="print-exam-box">
+              <strong>ประวัติปัจจุบัน (PI / CC):</strong> <span id="p-print-cc">-</span>
+            </div>
+            <div class="print-exam-box">
+              <strong>Subjective Examination:</strong> <span id="p-print-subjective">-</span>
+            </div>
+          </div>
+
+          <!-- Section 5: Physical Examination & Tests -->
+          <div class="print-section">
+            <div class="print-section-title">
+              <span>ผลการตรวจร่างกายและการประเมิน (OBJECTIVE ASSESSMENT)</span>
+            </div>
+            <div class="print-grid-2">
+              <div class="print-exam-box">
+                <strong>1. Observation:</strong> <span id="p-print-observation">-</span>
+              </div>
+              <div class="print-exam-box">
+                <strong>2. Palpation:</strong> <span id="p-print-palpation">-</span>
+              </div>
+              <div class="print-exam-box">
+                <strong>3. Measurement:</strong> <span id="p-print-measurement">-</span>
+              </div>
+              <div class="print-exam-box">
+                <strong>4. Physical Examination:</strong> <span id="p-print-physical">-</span>
+              </div>
+              <div class="print-exam-box">
+                <strong>5. Active & Passive Test:</strong> <span id="p-print-active-passive">-</span>
+              </div>
+              <div class="print-exam-box">
+                <strong>6. Special Test:</strong> <span id="p-print-special">-</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 6: Diagnosis & Treatment Plan -->
+          <div class="print-section">
+            <div class="print-section-title">
+              <span>การวินิจฉัยและการรักษา (DIAGNOSIS & TREATMENT PLAN)</span>
+            </div>
+            <div class="print-exam-box" style="border-left: 3px solid var(--accent-gold); background: #fdfaf3;">
+              <strong>PT Diagnosis (การวินิจฉัยทางกายภาพบำบัด):</strong>
+              <div id="p-print-diagnosis" style="margin-top: 2px; font-weight: 600; color: #1e293b;">-</div>
+            </div>
+            <div class="print-exam-box">
+              <strong>Treatment & Intervention (แผนการรักษาและหัตถการ):</strong>
+              <div id="p-print-treatment" style="margin-top: 2px;">-</div>
+            </div>
+          </div>
+
+          <!-- Footer Signature Area -->
+          <div class="print-footer-signature">
+            <div style="font-size: 11px; color: #64748b;">
+              <div>Merit Physiotherapy Clinic</div>
+              <div>เอกสารนี้เป็นเวชระเบียนผู้ป่วยลับเฉพาะของคลินิกกายภาพบำบัดเมอริท</div>
+            </div>
+
+            <div class="print-signature-box">
+              <div class="print-signature-line"></div>
+              <div style="font-weight: 600; font-size: 12px;">(................................................................)</div>
+              <div style="font-size: 11px; color: #475569; margin-top: 2px;">นักกายภาพบำบัด (กภ.)</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL: IMAGE / ATTACHMENT LIGHTBOX PREVIEW
+       ======================================================================= -->
+  <div class="modal-backdrop" id="image-preview-modal" style="z-index: 1100;">
+    <div class="modal-card modal-card-preview">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; min-width: 0;">
+          <i class="fa-solid fa-file-medical" style="color: var(--primary-color); font-size: 20px; flex-shrink: 0;"></i>
+          <div style="overflow: hidden; min-width: 0;">
+            <h3 id="lightbox-file-name" style="font-size: 15px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">ภาพพรีวิวทางการแพทย์</h3>
+            <div id="lightbox-file-meta" style="font-size: 11.5px; color: var(--text-muted); margin-top: 2px;">-</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
+          <!-- Zoom Controls (Zoom Out, Reset 100%, Zoom In) -->
+          <div class="lightbox-zoom-controls">
+            <button type="button" class="btn-icon" id="btn-lightbox-zoom-out" title="ซูมออก (- หรือ Ctrl+ล้อเมาส์ลง)">
+              <i class="fa-solid fa-magnifying-glass-minus"></i>
+            </button>
+            <button type="button" class="btn-icon btn-zoom-reset" id="btn-lightbox-zoom-reset" title="รีเซ็ตขนาดเดิม 100% (0)">
+              <span id="lightbox-zoom-level-text">100%</span>
+            </button>
+            <button type="button" class="btn-icon" id="btn-lightbox-zoom-in" title="ซูมเข้า (+ หรือ Ctrl+ล้อเมาส์ขึ้น)">
+              <i class="fa-solid fa-magnifying-glass-plus"></i>
+            </button>
+          </div>
+
+          <a href="#" target="_blank" class="btn btn-outline btn-sm" id="lightbox-drive-link" title="เปิดดูใน Google Drive">
+            <i class="fa-brands fa-google-drive"></i> ใน Drive
+          </a>
+          <a href="#" download target="_blank" class="btn btn-primary btn-sm" id="lightbox-download-link" title="ดาวน์โหลดไฟล์">
+            <i class="fa-solid fa-download"></i> ดาวน์โหลด
+          </a>
+          <button type="button" class="modal-close-btn" id="btn-close-lightbox" title="ปิดหน้าต่าง (Esc)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <div class="modal-body lightbox-body" id="lightbox-body">
+        <!-- Loading State -->
+        <div id="lightbox-loader" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #cbd5e1; padding: 60px 20px;">
+          <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 38px; color: #38bdf8;"></i>
+          <span style="font-size: 13.5px; font-weight: 500;">กำลังโหลดภาพความละเอียดสูงจาก Google Drive...</span>
+        </div>
+
+        <!-- Fallback Error State -->
+        <div id="lightbox-error" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #e2e8f0; padding: 60px 20px; text-align: center;">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size: 40px; color: #f59e0b;"></i>
+          <div style="font-size: 14px; font-weight: 600;">ไม่สามารถโหลดตัวอย่างภาพได้โดยตรง</div>
+          <div style="font-size: 12px; color: #94a3b8; max-width: 420px;">อาจเกิดจากข้อจำกัดด้านสิทธิ์หรือคุกกี้ของ Google คุณสามารถกดเปิดดูไฟล์ต้นฉบับใน Google Drive หรือดาวน์โหลดได้ทันที</div>
+          <a id="lightbox-error-drive-link" href="#" target="_blank" class="btn btn-primary btn-sm" style="margin-top: 6px;">
+            <i class="fa-brands fa-google-drive"></i> เปิดดูไฟล์โดยตรงใน Google Drive
+          </a>
+        </div>
+
+        <!-- Image Container (Scrollable up and down with mouse wheel) -->
+        <div class="lightbox-img-wrap" id="lightbox-img-wrap">
+          <img src="" alt="ภาพพรีวิวทางการแพทย์" id="lightbox-img">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL: CREATE NEW APPOINTMENT (GOOGLE CALENDAR)
+       ======================================================================= -->
+  <div class="modal-backdrop" id="create-appt-modal">
+    <div class="modal-card modal-card-md">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-calendar-plus" style="color: var(--primary-color); font-size: 20px;"></i>
+          <h3>สร้างนัดหมายคนไข้ใหม่ (Google Calendar)</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="btn-close-create-appt-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="form-create-appt" onsubmit="return false;">
+        <div class="modal-body">
+          <div class="form-grid">
+            <!-- Patient Search (Type Name or HN to prevent overload) -->
+            <div class="form-group col-6" style="position: relative;">
+              <label for="appt-patient-search"><i class="fa-solid fa-magnifying-glass"></i> คนไข้ในระบบ (พิมพ์ค้นหาชื่อ หรือ HN)</label>
+              <div class="appt-patient-search-wrap">
+                <input type="text" id="appt-patient-search" placeholder="พิมพ์ชื่อ, นามสกุล หรือ HN เพื่อค้นหา..." autocomplete="off">
+                <button type="button" class="btn-clear-search" id="btn-clear-appt-patient" title="ล้างการเลือกคนไข้" style="display: none; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px;">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <div class="appt-patient-dropdown" id="appt-patient-dropdown" style="display: none;"></div>
+              <input type="hidden" id="appt-selected-hn" value="">
+            </div>
+
+            <!-- Appointment Title -->
+            <div class="form-group col-6">
+              <label for="appt-title-input">หัวข้อนัดหมาย <span class="req">*</span></label>
+              <input type="text" id="appt-title-input" placeholder="เช่น นัดทำกายภาพบำบัด: นาย... (HN: ...)" required>
+            </div>
+
+            <!-- Appointment Date -->
+            <div class="form-group col-4">
+              <label for="appt-form-date">วันที่นัดหมาย <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-calendar-check"></i>
+                <input type="date" id="appt-form-date" required>
+              </div>
+              <div id="appt-form-thai-date-preview" style="font-size: 11.5px; color: var(--primary-color); font-weight: 600; margin-top: 4px;"></div>
+            </div>
+
+            <!-- Start Time (24h Thai Format) -->
+            <div class="form-group col-4">
+              <label for="appt-form-time-start">เวลาเริ่มต้น (ระบบ 24 ชม.) <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-clock"></i>
+                <select id="appt-form-time-start" required>
+                  <!-- Populated dynamically with 24h format e.g. 09:00 น., 09:15 น., 09:30 น. -->
+                </select>
+              </div>
+            </div>
+
+            <!-- End Time (24h Thai Format) -->
+            <div class="form-group col-4">
+              <label for="appt-form-time-end">เวลาสิ้นสุด (ระบบ 24 ชม.) <span class="req">*</span></label>
+              <div class="input-with-icon">
+                <i class="fa-regular fa-clock"></i>
+                <select id="appt-form-time-end" required>
+                  <!-- Populated dynamically with 24h format e.g. 10:00 น., 10:15 น., 10:30 น. -->
+                </select>
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group col-12">
+              <label for="appt-form-location">สถานที่ / เตียงรักษา</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-location-dot"></i>
+                <input type="text" id="appt-form-location" placeholder="เช่น Merit Physiotherapy Clinic เตียง 1" value="Merit Physiotherapy Clinic">
+              </div>
+            </div>
+
+            <!-- Description / Notes -->
+            <div class="form-group col-12">
+              <label for="appt-form-desc">รายละเอียดการนัดหมาย / อาการ / เบอร์ติดต่อ</label>
+              <textarea id="appt-form-desc" rows="3" placeholder="ระบุอาการ, แผนการรักษา, หรือเบอร์โทรติดต่อคนไข้..."></textarea>
+            </div>
+          </div>
+
+          <div class="appt-notice-box" style="margin-top: 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 10px 14px; font-size: 12px; color: #1e40af; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>นัดหมายจะถูกบันทึกลงใน Google Calendar ของ Gmail โดยตรงแบบเรียลไทม์</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-cancel-create-appt">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-create-appt">
+            <i class="fa-solid fa-floppy-disk"></i> บันทึกนัดหมายลง Google Calendar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL: DELETE APPOINTMENT CONFIRMATION
+       ======================================================================= -->
+  <div class="modal-backdrop" id="delete-appt-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="color: var(--color-danger); display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-calendar-xmark"></i> ยืนยันการยกเลิกนัดหมาย
+        </h3>
+        <button class="modal-close-btn" id="btn-close-delete-appt-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 14.5px; color: #334155;">
+          คุณแน่ใจหรือไม่ว่าต้องการยกเลิกนัดหมายนี้ใน Google Calendar?
+        </p>
+        <div style="margin-top: 14px; background: #fff1f2; border: 1px solid #fecdd3; padding: 12px 16px; border-radius: var(--radius-md);">
+          <div>หัวข้อนัดหมาย: <strong id="del-appt-title-display" style="color: var(--primary-color);">-</strong></div>
+          <div style="margin-top: 4px;">วัน-เวลา: <strong id="del-appt-time-display" style="color: #be123c;">-</strong></div>
+        </div>
+        <p style="font-size: 12px; color: #64748b; margin-top: 10px;">
+          * การยกเลิกจะลบนัดหมายนี้ออกจาก Google Calendar ของ Gmail โดยตรง
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="btn-cancel-delete-appt">ไม่ยกเลิก</button>
+        <button class="btn btn-danger" id="btn-confirm-delete-appt">
+          <i class="fa-solid fa-calendar-xmark"></i> ยืนยันยกเลิกนัดหมาย
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       MODAL: PRINTABLE RECEIPT / TAX INVOICE (ใบเสร็จรับเงิน)
+       ======================================================================= -->
+  <div class="modal-backdrop" id="receipt-modal">
+    <div class="modal-card receipt-modal-card">
+      <div class="modal-header no-print">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-receipt" style="color: var(--primary-color); font-size: 20px;"></i>
+          <h3>ใบเสร็จรับเงิน (ชุดต้นฉบับ & สำเนา 2 ตอนใน A4 แผ่นเดียว)</h3>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn-gold" id="btn-trigger-print-receipt">
+            <i class="fa-solid fa-print"></i> สั่งพิมพ์ใบเสร็จ (Print A4)
+          </button>
+          <button type="button" class="modal-close-btn" id="btn-close-receipt-modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <div class="receipt-preview-scroll">
+        <!-- The Printable Receipt Document (2 Slips on 1 A4 Page) -->
+        <div class="receipt-page-a4" id="printable-receipt-document">
+          <!-- PART 1: ORIGINAL (ต้นฉบับ สำหรับผู้รับบริการ) -->
+          <div class="receipt-slip receipt-original" id="rec-slip-original">
+            <!-- Populated dynamically by renderReceiptSlipHtml -->
+          </div>
+
+          <!-- PERFORATION CUT LINE (รอยประแบ่งตัด) -->
+          <div class="receipt-cut-line">
+            <span class="cut-line-badge"><i class="fa-solid fa-scissors"></i> ตัดตามรอยประ (ครึ่งบน: ต้นฉบับสำหรับลูกค้า / ครึ่งล่าง: สำเนาสำหรับคลินิก)</span>
+          </div>
+
+          <!-- PART 2: COPY (สำเนา สำหรับคลินิก/แฟ้มบัญชี) -->
+          <div class="receipt-slip receipt-copy" id="rec-slip-copy">
+            <!-- Populated dynamically by renderReceiptSlipHtml -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-box"></div>
+
+  <!-- Scripts -->
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

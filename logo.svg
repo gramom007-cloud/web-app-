@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 550" width="100%" height="100%">
+  <!-- Style definitions -->
+  <defs>
+    <style>
+      .gem-line {
+        fill: none;
+        stroke: #2c5282; /* Deep Blue-gray for the lines */
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .gem-line-bold {
+        fill: none;
+        stroke: #2c5282;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .brand-title {
+        font-family: 'Cinzel', 'Times New Roman', serif;
+        font-size: 52px;
+        fill: #c5a880; /* Gold */
+        text-anchor: middle;
+        letter-spacing: 0.15em;
+        font-weight: 500;
+      }
+      .brand-subtitle {
+        font-family: 'Inter', 'Sarabun', sans-serif;
+        font-size: 24px;
+        fill: #4a5568; /* Charcoal/Dark Blue-gray */
+        text-anchor: middle;
+        letter-spacing: 0.25em;
+        font-weight: 300;
+      }
+      .brand-sub-th {
+        font-family: 'Sarabun', sans-serif;
+        font-size: 16px;
+        fill: #718096;
+        text-anchor: middle;
+        letter-spacing: 0.1em;
+        font-weight: 400;
+      }
+    </style>
+    <!-- Import Google Fonts for rendering inside SVG -->
+    <link xmlns="http://www.w3.org/2000/svg" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500&amp;family=Inter:wght@300;400&amp;family=Sarabun:wght@300;400&amp;display=swap" rel="stylesheet"/>
+  </defs>
+
+  <!-- Gem Geometric Art -->
+  <g transform="translate(0, -20)">
+    <!-- Outer Outline Diamond -->
+    <polygon points="250,50 380,180 250,310 120,180" class="gem-line-bold" />
+    
+    <!-- Central Rhombus (Inner Diamond) -->
+    <polygon points="250,110 320,180 250,250 180,180" class="gem-line" />
+    
+    <!-- Horizontal & Vertical Axes -->
+    <line x1="250" y1="50" x2="250" y2="310" class="gem-line" />
+    <line x1="120" y1="180" x2="380" y2="180" class="gem-line" />
+    
+    <!-- Corner to Inner-Corner Diagonals -->
+    <!-- Top to sides -->
+    <line x1="250" y1="50" x2="180" y2="180" class="gem-line" />
+    <line x1="250" y1="50" x2="320" y2="180" class="gem-line" />
+    
+    <!-- Bottom to sides -->
+    <line x1="250" y1="310" x2="180" y2="180" class="gem-line" />
+    <line x1="250" y1="310" x2="320" y2="180" class="gem-line" />
+    
+    <!-- Left to inner vertical points -->
+    <line x1="120" y1="180" x2="250" y2="110" class="gem-line" />
+    <line x1="120" y1="180" x2="250" y2="250" class="gem-line" />
+    
+    <!-- Right to inner vertical points -->
+    <line x1="380" y1="180" x2="250" y2="110" class="gem-line" />
+    <line x1="380" y1="180" x2="250" y2="250" class="gem-line" />
+    
+    <!-- Diagonal facets forming smaller triangles -->
+    <!-- Top-left outer to top-center inner -->
+    <line x1="185" y1="115" x2="250" y2="110" class="gem-line" />
+    <!-- Top-right outer to top-center inner -->
+    <line x1="315" y1="115" x2="250" y2="110" class="gem-line" />
+    
+    <!-- Bottom-left outer to bottom-center inner -->
+    <line x1="185" y1="245" x2="250" y2="250" class="gem-line" />
+    <!-- Bottom-right outer to bottom-center inner -->
+    <line x1="315" y1="245" x2="250" y2="250" class="gem-line" />
+
+    <!-- Extra starburst lines for realism -->
+    <line x1="185" y1="115" x2="180" y2="180" class="gem-line" />
+    <line x1="315" y1="115" x2="320" y2="180" class="gem-line" />
+    <line x1="185" y1="245" x2="180" y2="180" class="gem-line" />
+    <line x1="315" y1="245" x2="320" y2="180" class="gem-line" />
+  </g>
+
+  <!-- Typography -->
+  <!-- "MERIT" in Gold -->
+  <text x="250" y="375" class="brand-title">MERIT</text>
+  
+  <!-- "Physiotherapy Clinic" in Blue-gray -->
+  <text x="254" y="420" class="brand-subtitle">Physiotherapy</text>
+  <text x="250" y="460" class="brand-subtitle">Clinic</text>
+  
+  <!-- Thai Name below -->
+  <text x="250" y="505" class="brand-sub-th">คลินิกกายภาพบำบัดเมอริท</text>
+</svg>
